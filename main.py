@@ -1,14 +1,9 @@
 import streamlit as st
 import langchain_helper
-"""
-This script uses the Streamlit library to create a web application for generating restaurant names.
-Streamlit is a Python library that allows for the creation of interactive, data-driven web apps
-directly from Python scripts.
-"""
+
 st.title("Restaurant Name Generator") 
 
 cuisine = st.sidebar.selectbox("Pick a Cuisine", ["Italian", "Chinese", "Mexican", "Indian"])
-
 
 if cuisine:
     try:
@@ -22,4 +17,3 @@ if cuisine:
             st.write("-", item)
     except Exception as e:
         st.error(f"Failed to generate results: {e}")
-

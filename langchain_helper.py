@@ -1,40 +1,32 @@
+# langchain_helper.py
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain.chains import SequentialChain
-
+from langchain.chains import LLMChain, SequentialChain
 import os
 
-
 def _get_openai_api_key():
-    """Resolve OpenAI API key from environment or Streamlit secrets."""
-    # Try environment variable first
     api_key = os.getenv("OPENAI_API_KEY", "")
     if not api_key:
-        # Fallback to Streamlit secrets if available (e.g., Streamlit Community Cloud)
         try:
-            import streamlit as st  # Imported here to avoid hard dependency outside Streamlit
+            import streamlit as st
             api_key = st.secrets.get("OPENAI_API_KEY", "")
         except Exception:
             api_key = ""
     if not api_key:
-        raise RuntimeError(
-            "OPENAI_API_KEY is not set. Set it as an environment variable or in Streamlit secrets."
-        )
+        raise RuntimeError("OPENAI_API_KEY is not set. Set it as an environment variable or in Streamlit secrets.")
     return api_key
-
 
 def _create_llm():
     api_key = _get_openai_api_key()
-    return OpenAI(temperature=0.7, openai_api_key=api_key)
-
+    # Updated model to gpt-3.5-turbo
+    return OpenAI(model_name="gpt-3.5-turbo", temperature=0.7, openai_api_key=api_key)
 
 def generate_restaurant_name_and_items(cuisine):
     llm = _create_llm()
 
     prompt_template_name = PromptTemplate(
         input_variables=["cuisine"],
-        template="I want to open restaurant for {cuisine} food. Suggest a fancy name for this.",
+        template="I want to open a restaurant for {cuisine} food. Suggest a fancy name for this.",
     )
     name_chain = LLMChain(
         llm=llm, prompt=prompt_template_name, output_key="restaurant_name"
@@ -55,7 +47,6 @@ def generate_restaurant_name_and_items(cuisine):
     )
     response = chain.invoke({"cuisine": cuisine})
     return response
-
 
 if __name__ == "__main__":
     import argparse
